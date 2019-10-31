@@ -8,6 +8,7 @@
 
 from scrapy import Item, Field
 
+
 class TweetsItem(Item):
     """ 微博信息 """
     collection = 'Tweets'
@@ -25,6 +26,18 @@ class TweetsItem(Item):
     video_url = Field()  # 视频
     location = Field()  # 定位信息
     origin_weibo = Field()  # 原始微博，只有转发的微博才有这个字段
+    crawled_at = Field()  # 抓取时间戳
+
+
+class CommentItem(Item):
+    """ 微博评论 """
+    collection = 'Comment'
+
+    id = Field()  # 评论id
+    tweets_id = Field()  # 微博id
+    comment_url = Field()  # 评论URL
+    content = Field()  # 评论内容
+    other_info = Field()  # 评论时间和设备
     crawled_at = Field()  # 抓取时间戳
 
 
@@ -48,4 +61,3 @@ class InformationItem(Item):
     authentication = Field()  # 认证
     labels = Field()  # 标签
     crawled_at = Field()  # 抓取时间戳
-

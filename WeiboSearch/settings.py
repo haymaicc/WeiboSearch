@@ -22,7 +22,7 @@ NEWSPIDER_MODULE = 'WeiboSearch.spiders'
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 16
+CONCURRENT_REQUESTS = 1
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -105,4 +105,4 @@ DB_NAME = 'weibosearch'
 
 
 # ip代理 池
-PROXY_URL = 'http://127.0.0.1:5000/proxy/target/weibo/cn'
+PROXY_URL = 'http://127.0.0.1:5000/get_all/'

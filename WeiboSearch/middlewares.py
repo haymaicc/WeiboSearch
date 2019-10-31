@@ -6,23 +6,27 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 
-
-
 import json
 import logging
-import requests
 import random
 
-from WeiboSearch.settings import LOCAL_MONGO_PORT, LOCAL_MONGO_HOST, DB_NAME
 import pymongo
+import requests
+
+from WeiboSearch.settings import LOCAL_MONGO_PORT, LOCAL_MONGO_HOST, DB_NAME
+
 
 # 代理ip
+# 使用代理
 class ProxyMiddleware():
     def __init__(self, proxy_url):
         self.logger = logging.getLogger(__name__)
         self.proxy_url = proxy_url
+        self.proxy = ""
 
     def get_random_proxy(self):
+        if self.proxy:
+            return self.proxy
         try:
             # response = requests.get(self.proxy_url)
             # if response.status_code == 200:
@@ -31,21 +35,18 @@ class ProxyMiddleware():
             response = requests.get(self.proxy_url)
             if response.status_code == 200:
                 proxy_d = random.choice(json.loads(response.text))
-                ip = proxy_d.get('ip')
-                port = proxy_d.get('port')
-                proxy = ip + ':' + port
-
-                return proxy
+                self.proxy = proxy_d.get('proxy')
+                return self.proxy
         except requests.ConnectionError:
             return False
 
     def process_request(self, request, spider):
         # if request.meta.get('retry_times'):
-            proxy = self.get_random_proxy()
-            if proxy:
-                uri = 'https://{proxy}'.format(proxy=proxy)
-                self.logger.debug('使用代理 ' + proxy)
-                request.meta['proxy'] = uri
+        proxy = self.get_random_proxy()
+        if proxy:
+            uri = 'https://{proxy}'.format(proxy=proxy)
+            self.logger.debug('使用代理 ' + proxy)
+            request.meta['proxy'] = uri
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -53,6 +54,7 @@ class ProxyMiddleware():
         return cls(
             proxy_url=settings.get('PROXY_URL')
         )
+
 
 # cookie池
 class CookiesMiddleware(object):
@@ -72,6 +74,7 @@ class CookiesMiddleware(object):
         random_account = self.account_collection.find({'status': 'success'})[random_index]
         request.headers.setdefault('Cookie', random_account['cookie'])
         request.meta['account'] = random_account
+
 
 from scrapy import signals
 
